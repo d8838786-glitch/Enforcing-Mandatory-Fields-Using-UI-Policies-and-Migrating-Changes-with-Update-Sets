@@ -1,0 +1,109 @@
+🚀 Project: Enforce Mandatory Fields via UI Policy & Migrate Using Update Sets
+🎯 Objective
+
+Ensure that when a user selects a specific value (e.g., Incident Category = Hardware), a field (e.g., Subcategory) becomes mandatory, and then migrate this configuration from Dev → Test → Prod using Update Sets.
+
+🧩 PART 1: Create UI Policy (Enforce Mandatory Field)
+📌 Scenario
+Table: Incident
+Condition: Category = Hardware
+Action: Make Subcategory mandatory
+🔧 Step 1: Create UI Policy
+
+Navigate to:
+
+System UI → UI Policies → New
+
+Fill in:
+
+Table: Incident
+Short Description: Make Subcategory mandatory for Hardware
+Conditions:
+Field: Category
+Operator: is
+Value: Hardware
+✔️ Run scripts: Optional
+✔️ Reverse if false: TRUE (important)
+⚙️ Step 2: Add UI Policy Action
+
+Inside the UI Policy, scroll to UI Policy Actions → New
+
+Field name: Subcategory
+✔️ Mandatory: TRUE
+✔️ Visible: True (optional)
+✔️ Read-only: False
+💻 Optional: Advanced Script (UI Policy Script)
+
+If you want dynamic logic:
+
+function onCondition() {
+    if (g_form.getValue('category') == 'hardware') {
+        g_form.setMandatory('subcategory', true);
+    } else {
+        g_form.setMandatory('subcategory', false);
+    }
+}
+✅ Testing
+Open an Incident form
+Select Category = Hardware
+Subcategory should become mandatory
+Change category → requirement should reverse
+🔁 PART 2: Migration Using Update Sets
+📦 Step 1: Create Update Set
+
+Navigate:
+
+System Update Sets → Local Update Sets → New
+
+Name: UI Policy Mandatory Field Migration
+State: In Progress
+
+👉 Set it as Current Update Set
+
+🧲 Step 2: Capture Changes
+
+Now create/edit your UI Policy → it will automatically be captured.
+
+To verify:
+
+Customer Updates → Check records
+
+📤 Step 3: Move Update Set
+Export from Dev:
+Open Update Set
+Click Export to XML
+Import into Test/Prod:
+
+Navigate:
+
+Retrieved Update Sets → Import Update Set from XML
+
+Upload file
+Click Preview
+Resolve conflicts (if any)
+Click Commit
+⚠️ Best Practices
+Always Preview before Commit
+Use meaningful naming
+Avoid capturing unwanted changes
+Use one update set per feature
+🧪 Bonus: GlideForm Client Script Alternative
+
+Instead of UI Policy:
+
+g_form.setMandatory('subcategory', true);
+
+But UI Policies are preferred because:
+
+No coding required
+Easier to maintain
+Declarative approach
+🧱 Project Structure Summary
+Component	Purpose
+UI Policy	Define condition
+UI Policy Action	Enforce mandatory field
+Update Set	Transport configuration
+🎉 Final Outcome
+Subcategory becomes mandatory dynamically
+Behavior is consistent across environments
+Migration is clean and controlled
